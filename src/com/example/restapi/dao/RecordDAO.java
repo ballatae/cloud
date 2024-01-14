@@ -36,12 +36,11 @@ public class RecordDAO {
     private static final String INSERT_DAILY_RECORD = "INSERT INTO DailyRecord ( glucoseLevel, carbIntake, medicationDose, entryDate, patient_id) VALUES ( ?, ?, ?, ?, ?)";
     private static final String SELECT_ALL_RECORDS = "SELECT * FROM DailyRecord WHERE patient_id = ?";
     private static final String DELETE_RECORD = "DELETE FROM DailyRecord WHERE id = ?";
-    private static final String SELECT_ALL_RECORDS_WITHIN_PERIOD = "SELECT * FROM DailyRecord WHERE patient_id = ? AND entryDate BETWEEN ? AND ?";
-    private static final String GET_AVERAGE_VALUES = 
-            "SELECT AVG(glucoseLevel) AS averageGlucose, AVG(carbIntake) AS averageCarbIntake FROM DailyRecord WHERE patient_id = ?";
-    private static final String GET_AVERAGE_VALUES_ALL = "SELECT AVG(glucoseLevel) AS averageGlucose, AVG(carbIntake) AS averageCarbIntake FROM DailyRecord WHERE patient_id = ?";
-    private static final String SELECT_RECORDS_WITHIN_PERIOD = 
-            "SELECT entryDate, glucoseLevel, carbIntake FROM DailyRecord WHERE patient_id = ?";
+
+    private static final String GET_AVERAGE_VALUES = "SELECT AVG(glucoseLevel) AS averageGlucose, AVG(carbIntake) AS averageCarbIntake FROM DailyRecord WHERE patient_id = ?";
+
+    private static final String SELECT_RECORDS_WITHIN_PERIOD = "SELECT entryDate, glucoseLevel, carbIntake FROM DailyRecord WHERE patient_id = ?";
+
     // Private constructor to prevent instantiation from outside
     private RecordDAO() {
         try {
@@ -60,43 +59,44 @@ public class RecordDAO {
         }
         return instance;
     }
-    
+
     public boolean addPatient(Patient patient) {
-    	 try (PreparedStatement statement = connection.prepareStatement(ADD_PATIENT, PreparedStatement.RETURN_GENERATED_KEYS)) {
-             
-             statement.setString(1, patient.getName());
-             statement.setString(2, patient.getSurname());
-             
-             // Assuming id is auto-incremented
+        try (PreparedStatement statement = connection.prepareStatement(ADD_PATIENT,
+                PreparedStatement.RETURN_GENERATED_KEYS)) {
 
-             int affectedRows = statement.executeUpdate();
+            statement.setString(1, patient.getName());
+            statement.setString(2, patient.getSurname());
 
-             return affectedRows > 0;
+            // Assuming id is auto-incremented
 
-         } catch (SQLException e) {
-             e.printStackTrace(); // Handle the exception according to your application's error handling strategy
-             // Return a special value (e.g., -1) to indicate failure
-         }
-    	 return false;
+            int affectedRows = statement.executeUpdate();
+
+            return affectedRows > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace(); // Handle the exception according to your application's error handling strategy
+            // Return a special value (e.g., -1) to indicate failure
+        }
+        return false;
     }
-    
+
     public boolean updatePatient(int id, Patient updatedPatient) {
-    	 try (PreparedStatement statement = connection.prepareStatement(UPDATE_PATIENT)) {
+        try (PreparedStatement statement = connection.prepareStatement(UPDATE_PATIENT)) {
 
-             statement.setString(1, updatedPatient.getName());
-             statement.setString(2, updatedPatient.getSurname());
-             statement.setInt(3, id);
+            statement.setString(1, updatedPatient.getName());
+            statement.setString(2, updatedPatient.getSurname());
+            statement.setInt(3, id);
 
-             int affectedRows = statement.executeUpdate();
+            int affectedRows = statement.executeUpdate();
 
-             return affectedRows > 0; // Return true if at least one row was updated
-         } catch (SQLException e) {
-             e.printStackTrace(); // Handle the exception according to your application's error handling strategy
-             // Return false to indicate failure
-         }
-    	 return false;
+            return affectedRows > 0; // Return true if at least one row was updated
+        } catch (SQLException e) {
+            e.printStackTrace(); // Handle the exception according to your application's error handling strategy
+            // Return false to indicate failure
+        }
+        return false;
     }
-    
+
     public boolean deleteRecord(long id) {
         try (PreparedStatement statement = connection.prepareStatement(DELETE_RECORD)) {
             statement.setLong(1, id);
@@ -105,11 +105,12 @@ public class RecordDAO {
 
             return affectedRows > 0;
         } catch (SQLException e) {
-            e.printStackTrace(); 
+            e.printStackTrace();
             // Handle the exception according to your application's error handling strategy
         }
         return false;
     }
+
     public boolean deleteUserById(int id) {
         try (PreparedStatement statement = connection.prepareStatement("DELETE FROM users WHERE id = ?")) {
             statement.setInt(1, id);
@@ -118,13 +119,12 @@ public class RecordDAO {
 
             return affectedRows > 0;
         } catch (SQLException e) {
-            e.printStackTrace(); 
+            e.printStackTrace();
             // Handle the exception according to your application's error handling strategy
         }
         return false;
     }
 
-    
     public boolean deletePatient(int id) {
         try (PreparedStatement statement = connection.prepareStatement(DELETE_PATIENT)) {
             statement.setLong(1, id);
@@ -134,16 +134,16 @@ public class RecordDAO {
             return affectedRows > 0;
 
         } catch (SQLException e) {
-            e.printStackTrace(); 
+            e.printStackTrace();
             // Handle the exception according to your application's error handling strategy
         }
         return false;
     }
-    
-    
+
     public boolean addDailyRecord(Record record) {
-        try (PreparedStatement statement = connection.prepareStatement(INSERT_DAILY_RECORD, PreparedStatement.RETURN_GENERATED_KEYS)) {
-            
+        try (PreparedStatement statement = connection.prepareStatement(INSERT_DAILY_RECORD,
+                PreparedStatement.RETURN_GENERATED_KEYS)) {
+
             statement.setInt(1, record.getGlucoseLevel());
             statement.setInt(2, record.getCarbIntake());
             statement.setString(3, record.getMedicationDose());
@@ -155,14 +155,13 @@ public class RecordDAO {
 
             return affectedRows > 0;
 
-          
-
         } catch (SQLException e) {
             e.printStackTrace(); // Handle the exception according to your application's error handling strategy
             // Return a special value (e.g., -1) to indicate failure
-        } 
+        }
         return false;
     }
+
     public Record getRecordById(long id) {
         Record record = null;
 
@@ -187,7 +186,7 @@ public class RecordDAO {
 
         return record;
     }
-    
+
     public User getUserById(int id) {
         User user = null;
 
@@ -211,7 +210,7 @@ public class RecordDAO {
 
         return user;
     }
-    
+
     public Patient getPatientById(int id) {
         Patient patient = null;
 
@@ -220,11 +219,11 @@ public class RecordDAO {
 
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
-                	patient = new Patient();
-                	patient.setPatientId(id);
-                	patient.setName(resultSet.getString("name"));
-                	patient.setSurname(resultSet.getString("surname"));
-                   
+                    patient = new Patient();
+                    patient.setPatientId(id);
+                    patient.setName(resultSet.getString("name"));
+                    patient.setSurname(resultSet.getString("surname"));
+
                 }
             }
 
@@ -235,7 +234,7 @@ public class RecordDAO {
 
         return patient;
     }
-    
+
     public boolean updateRecord(long id, Record updatedRecord) {
         try (PreparedStatement statement = connection.prepareStatement(
                 "UPDATE DailyRecord SET glucoseLevel=?, carbIntake=?, medicationDose=?, entryDate=? WHERE id=?")) {
@@ -251,11 +250,11 @@ public class RecordDAO {
             return affectedRows > 0; // Return true if at least one row was updated
         } catch (SQLException e) {
             e.printStackTrace(); // Handle the exception according to your application's error handling strategy
-             // Return false to indicate failure
+            // Return false to indicate failure
         }
         return false;
     }
-   
+
     public List<Record> getRecordsWithinPeriod(int patientId, String startDate, String endDate) {
         List<Record> records = new ArrayList<>();
 
@@ -294,16 +293,14 @@ public class RecordDAO {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();  // Handle exceptions appropriately
+            e.printStackTrace(); // Handle exceptions appropriately
         }
 
         return records;
     }
 
-    
     public List<Record> getAllRecordsWithinTheSpecifiedPeriod(int patientID, String startDate, String endDate) {
         List<Record> records = new ArrayList<>();
-
 
         try {
             StringBuilder queryBuilder = new StringBuilder(SELECT_ALL_RECORDS);
@@ -312,7 +309,6 @@ public class RecordDAO {
 
             if (startDate != null && !startDate.trim().isEmpty() || endDate != null && !endDate.trim().isEmpty()) {
 
-            	
                 if (startDate != null && !startDate.trim().isEmpty()) {
                     queryBuilder.append(" AND entryDate >= ?");
                     parameters.add(startDate);
@@ -350,6 +346,7 @@ public class RecordDAO {
 
         return records;
     }
+
     public List<Record> getAllRecords(int patientId) {
         List<Record> records = new ArrayList<>();
 
@@ -378,6 +375,7 @@ public class RecordDAO {
 
         return records;
     }
+
     public List<User> getAllUsers() {
         List<User> users = new ArrayList<>();
 
@@ -405,7 +403,6 @@ public class RecordDAO {
         return users;
     }
 
-
     public List<Patient> getAllPatients() {
         List<Patient> patients = new ArrayList<>();
 
@@ -424,12 +421,11 @@ public class RecordDAO {
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            // Handle exceptions and return an empty list or throw an exception if needed
+
         }
 
         return patients;
     }
-
 
     public Map<String, Double> getAverageValues(int id, String startDate, String endDate) {
         Map<String, Double> averageValues = new HashMap<>();
@@ -469,103 +465,94 @@ public class RecordDAO {
                 }
             }
         } catch (SQLException e) {
-	        if (e instanceof SQLIntegrityConstraintViolationException) {
-	            // Unique constraint violation (duplicate username)
-	            // Handle this case and return an error message or throw a custom exception
-	            e.printStackTrace(); // For demonstration, print the stack trace
-	            throw new RuntimeException("Username already exists. Please choose a different username.");
-	        } else {
-	            // Handle other SQL exceptions according to your error handling strategy
-	            e.printStackTrace();
-	            throw new RuntimeException("Error adding user. Please try again.");
-	        }
-	    }
+            if (e instanceof SQLIntegrityConstraintViolationException) {
+                // Unique constraint violation (duplicate username)
+                // Handle this case and return an error message or throw a custom exception
+                e.printStackTrace(); // For demonstration, print the stack trace
+                throw new RuntimeException("Username already exists. Please choose a different username.");
+            } else {
+                // Handle other SQL exceptions according to your error handling strategy
+                e.printStackTrace();
+                throw new RuntimeException("Error adding user. Please try again.");
+            }
+        }
 
-        
     }
 
-public boolean authenticateUser(String username, String password) {
+    public boolean authenticateUser(String username, String password) {
         String query = "SELECT * FROM users WHERE BINARY username = ?";
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setString(1, username);
 
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
-                   String hashedPassword = resultSet.getString("password");
-                   
-                   boolean passwordSame= BCrypt.verifyer().verify(password.toCharArray(), hashedPassword).verified;
-                   
-                   return passwordSame;
+                    String hashedPassword = resultSet.getString("password");
+
+                    boolean passwordSame = BCrypt.verifyer().verify(password.toCharArray(), hashedPassword).verified;
+
+                    return passwordSame;
                 }
                 return false;
             }
         } catch (SQLException e) {
-	        if (e instanceof SQLIntegrityConstraintViolationException) {
-	            // Unique constraint violation (duplicate username)
-	            // Handle this case and return an error message or throw a custom exception
-	            e.printStackTrace(); // For demonstration, print the stack trace
-	            throw new RuntimeException("Authentication failed check your credentials");
-	        } else {
-	            // Handle other SQL exceptions according to your error handling strategy
-	            e.printStackTrace();
-	            throw new RuntimeException("Error adding user. Please try again.");
-	        }
-	    }
-        
+            if (e instanceof SQLIntegrityConstraintViolationException) {
+                // Unique constraint violation (duplicate username)
+                // Handle this case and return an error message or throw a custom exception
+                e.printStackTrace(); // For demonstration, print the stack trace
+                throw new RuntimeException("Authentication failed check your credentials");
+            } else {
+                // Handle other SQL exceptions according to your error handling strategy
+                e.printStackTrace();
+                throw new RuntimeException("Error adding user. Please try again.");
+            }
+        }
+
     }
 
-	public boolean addUser(User user) {
-		try {
-			String passwordHashed = BCrypt.withDefaults().hashToString(12, user.getPassword().toCharArray());
-			String query = "INSERT INTO users (name, surname, username, password, role) VALUES (?,?,?,?,?)";
-	       PreparedStatement statement = connection.prepareStatement(query);
-	        	statement.setString(1, user.getName());
-	       statement.setString(2, user.getSurname());
-	       statement.setString(3, user.getUsername());
-	       statement.setString(4, passwordHashed);
-	       statement.setString(5, user.getRole());
-	       
-	       int affectedRows = statement.executeUpdate();
+    public boolean addUser(User user) {
+        try {
+            String passwordHashed = BCrypt.withDefaults().hashToString(12, user.getPassword().toCharArray());
+            String query = "INSERT INTO users (name, surname, username, password, role) VALUES (?,?,?,?,?)";
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setString(1, user.getName());
+            statement.setString(2, user.getSurname());
+            statement.setString(3, user.getUsername());
+            statement.setString(4, passwordHashed);
+            statement.setString(5, user.getRole());
 
-           return affectedRows > 0;
+            int affectedRows = statement.executeUpdate();
 
-	           
-			
-		} catch (SQLException e) {
-            e.printStackTrace(); // Handle the exception according to your application's error handling strategy
-            // Return a special value (e.g., -1) to indicate failure
-        } 
-        return false;
-	}
+            return affectedRows > 0;
 
-	public String getUserRole(String username) {
-	    
-
-	    try {
-	        String query = "SELECT role FROM users WHERE username = ?";
-	        PreparedStatement statement = connection.prepareStatement(query);
-	        statement.setString(1, username);
-	       
-
-	        try (ResultSet resultSet = statement.executeQuery()) {
-	            if (resultSet.next()) {
-	                String role = resultSet.getString("role");
-	                return role;
-	            } else {
-	                return null;
-	            }
-	        }
-	    } catch (SQLException e) {
+        } catch (SQLException e) {
             e.printStackTrace(); // Handle the exception according to your application's error handling strategy
             // Return a special value (e.g., -1) to indicate failure
         }
-		return null; 
-        
-	    } // Return null if the user is not found or an error occurs
-	
+        return false;
+    }
 
+    public String getUserRole(String username) {
 
-       
+        try {
+            String query = "SELECT role FROM users WHERE username = ?";
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setString(1, username);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    String role = resultSet.getString("role");
+                    return role;
+                } else {
+                    return null;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace(); // Handle the exception according to your application's error handling strategy
+            // Return a special value (e.g., -1) to indicate failure
+        }
+        return null;
+
+    } // Return null if the user is not found or an error occurs
 
     // Close the connection when the application is shutting down
     public void closeConnection() {
@@ -578,6 +565,4 @@ public boolean authenticateUser(String username, String password) {
         }
     }
 
-   
 }
-    

@@ -1,63 +1,73 @@
 @charset "ISO-8859-1";
-   body {
+
+body {
     font-family: Arial, sans-serif;
     margin: 20px;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    flex-wrap:wrap;
+    flex-wrap: wrap;
     background-color: #4d4d4d;
     color: #ffffff;
-  
+
 }
+
 table {
     border-collapse: collapse;
     width: 80%;
-    margin-bottom: 20px; /* Add margin for separation */
+    margin-bottom: 20px;
+    /* Add margin for separation */
 }
 
-th, td {
+th,
+td {
     border: 1px solid #ddd;
-    padding: 12px; /* Increased padding for better readability and spacing */
+    padding: 12px;
+    /* Increased padding for better readability and spacing */
     text-align: left;
 }
 
 th {
-    background-color: #4CAF50; /* Use a different color for header background */
-    color: white; /* White text for better contrast */
+    background-color: #4CAF50;
+    /* Use a different color for header background */
+    color: white;
+    /* White text for better contrast */
 }
 
 tr:hover {
-    background-color: #3b3939; /* Highlight row on hover */
+    background-color: #3b3939;
+    /* Highlight row on hover */
 }
-
-
 
 #leftContainer {
     width: 30%;
-    margin:0px;
-    overflow-y: auto; /* Enable vertical scrollbar if needed */
-    max-height: 500px; /* Set a max height */
+    margin: 0px;
+    overflow-y: auto;
+    /* Enable vertical scrollbar if needed */
+    max-height: 500px;
+    /* Set a max height */
 }
 
 #rightContainer {
     width: 45%;
-    display:flex;
+    display: flex;
     flex-direction: column;
     justify-content: center;
-    align-items:center;
+    align-items: center;
 }
-#canva{
+
+#canva {
     max-width: 2000px;
-    width:1000px;
+    width: 1000px;
     max-height: 400px;
     height: 400px;
-    
+
 }
 
 
-button, input[type="submit"] {
+button,
+input[type="submit"] {
     margin: 5px;
     padding: 3px;
     background-color: #4CAF50;
@@ -65,18 +75,21 @@ button, input[type="submit"] {
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    width:100%;
-   	
+    width: 100%;
+
 }
 
 #recordsContainer table tr:first-child td {
     grid-column: span 4;
 }
-button:hover, input[type="submit"]:hover {
+
+button:hover,
+input[type="submit"]:hover {
     background-color: #45a049;
 }
 
-#recordsContainer, #fullResource {
+#recordsContainer,
+#fullResource {
     margin-top: 20px;
     padding: 10px;
 }
@@ -93,29 +106,31 @@ button:hover, input[type="submit"]:hover {
 #leftContainer::-webkit-scrollbar-track {
     background-color: #3b3939;
 }
-	#forms {
-	height: fit-content;
+
+#forms {
+    height: fit-content;
     border: 1px solid #ccc;
     border-radius: 5px;
     background-color: #4d4d4d;
     box-shadow: 0px 0px 10px 0px #000000;
     color: #ffffff;
-	}
-	
-	#forms form{
-	padding: 15px;
-	}
-	#deleteForm{
-		padding: -15px;
+}
+
+#forms form {
+    padding: 15px;
+}
+
+#deleteForm {
+    padding: -15px;
     border: none;
     border-radius: 0px;
     box-shadow: none;
-	}
-  
-	
+}
+
+
 #forms form label {
     margin-bottom: 5px;
-    border:none;
+    border: none;
 }
 
 #forms form input {
@@ -137,24 +152,23 @@ button:hover, input[type="submit"]:hover {
 #forms form button:hover {
     background-color: #45a049;
 }
-        
-	#fullResource button{
- width: 40px;
- max-width: 40px;
- }   
+
+#fullResource button {
+    width: 40px;
+    max-width: 40px;
+}
 
 .canva {
     position: relative;
     margin-top: 3em;
     left: 50%;
     transform: translateX(-50%);
-    color: #ffffff;   
+    color: #ffffff;
 }
 
-#logOut{
-	position:absolute;
-	top:5px;
-	right:5px;
-	max-width: 80px;
+#logOut {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    max-width: 80px;
 }
-

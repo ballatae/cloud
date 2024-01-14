@@ -1,0 +1,8 @@
+com\example\restapi\dao\RecordResource.class
+com\example\restapi\dao\SecurityFilter.class
+com\example\restapi\dao\CORSFilter.class
+com\example\restapi\dao\Patient.class
+com\example\restapi\dao\RecordDAO.class
+com\example\restapi\dao\User.class
+com\example\restapi\dao\Application.class
+com\example\restapi\dao\Record.class

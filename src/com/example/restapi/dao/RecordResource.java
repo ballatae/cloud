@@ -28,7 +28,6 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.SecurityContext;
 import jakarta.ws.rs.core.UriBuilder;
 
-
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -47,108 +46,98 @@ public class RecordResource {
     private RecordDAO dao = RecordDAO.getInstance();
     static String key = "asdkjgaidgubairgqgiu";
     static Algorithm algorithm = Algorithm.HMAC256(key);
-    
+
     public static DecodedJWT verifyToken(String token) {
-    	JWTVerifier verifier = JWT.require(algorithm).build();
-    	return verifier.verify(token);
+        JWTVerifier verifier = JWT.require(algorithm).build();
+        return verifier.verify(token);
     }
-    
+
     @POST
     @Path("/login")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response login(User user) {
         // Validate the provided credentials (this is just a basic example)
-    	if(dao.authenticateUser(user.getUsername(), user.getPassword())) {
-    		String token = JWT.create()
-    				.withClaim("username", user.getUsername())
-    				.withClaim("password", user.getPassword())
-    				.sign(algorithm);
-    		
-    		 JsonObject jsonObject = Json.createObjectBuilder()
-    	                .add("token", token)
-    	                .build();
-    		return Response.ok(jsonObject.toString()).build();
-    		
-    	}
-    	
-    	return Response.status(Response.Status.UNAUTHORIZED).build();
+        if (dao.authenticateUser(user.getUsername(), user.getPassword())) {
+            String token = JWT.create()
+                    .withClaim("username", user.getUsername())
+                    .withClaim("password", user.getPassword())
+                    .sign(algorithm);
+
+            JsonObject jsonObject = Json.createObjectBuilder()
+                    .add("token", token)
+                    .build();
+            return Response.ok(jsonObject.toString()).build();
+
+        }
+
+        return Response.status(Response.Status.UNAUTHORIZED).build();
     }
-    
+
     @POST
     @RolesAllowed("ADMIN")
     @Path("/add-user")
     public Response addUser(User user) {
-    	if(dao.addUser(user)) {
-    		return Response.ok().entity("User added successfully").build();
-    	}
-    	return Response.status(Response.Status.BAD_REQUEST).entity("Invalid request or user data").build();
-    	}
-    
-    
-    @GET
-    @RolesAllowed({"ADMIN", "PHYSICIAN"})
-    public JsonObject getAllPatients() {
-    	
-        List<Patient> patients = dao.getAllPatients();
-if(patients != null) {
-        JsonArrayBuilder patientArrayBuilder = Json.createArrayBuilder();
-        JsonObjectBuilder linkBuilder = Json.createObjectBuilder();
-        JsonObjectBuilder linksBuilder = Json.createObjectBuilder()
-                .add("Add new patient", Json.createObjectBuilder()
-                        .add("href", "/MyProject/api/records/add-form-patient")
-                        .add("method", "GET"))
-                .add("View Users", Json.createObjectBuilder()
-                                .add("href", "/MyProject/api/records/users")
-                                .add("method", "GET")
-                        );
-
-        
-        linkBuilder.add("_links",linksBuilder);
-        
-        JsonObjectBuilder headerBuilder = Json.createObjectBuilder();
-
-       
-        headerBuilder.add("header patientId","Patient Id" );
-        headerBuilder.add("header name","Name" );
-        headerBuilder.add("header surname","Surname" );
-       
-       
-        
-        
-        
-        
-        patientArrayBuilder.add(linkBuilder);
-        patientArrayBuilder.add(headerBuilder);
-        patients.forEach(patient -> {
-            JsonObjectBuilder patientJson = Json.createObjectBuilder()
-                    .add("patientId", patient.getPatientId())
-                    .add("name", patient.getName())
-                    .add("surname", patient.getSurname())
-                    .add("_links", Json.createObjectBuilder()
-                    .add("View records", Json.createObjectBuilder()
-                            .add("href", "/MyProject/api/records/date-form/"+patient.getPatientId())
-                            .add("method", "GET"))
-                    .add("Edit Patient", Json.createObjectBuilder()
-                    		.add("href", "/MyProject/api/records/update-form-patient/"+patient.getPatientId())
-                            .add("method", "GET"))
-                    		);
-      
-
-            patientArrayBuilder.add(patientJson);
-        });
-
-        // Build the JSON object with hypermedia links
-        JsonObjectBuilder responseBuilder = Json.createObjectBuilder()
-                .add("status", "success")
-                .add("data", patientArrayBuilder);
-               
-
-        return responseBuilder.build();
-    	}
-            // Catch the exception thrown by addUser method
-return (JsonObject) Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("An unexpected error occurred").build();
+        if (dao.addUser(user)) {
+            return Response.ok().entity("User added successfully").build();
         }
-    
+        return Response.status(Response.Status.BAD_REQUEST).entity("Invalid request or user data").build();
+    }
+
+    @GET
+    @RolesAllowed({ "ADMIN", "PHYSICIAN" })
+    public JsonObject getAllPatients() {
+
+        List<Patient> patients = dao.getAllPatients();
+        if (patients != null) {
+            JsonArrayBuilder patientArrayBuilder = Json.createArrayBuilder();
+            JsonObjectBuilder linkBuilder = Json.createObjectBuilder();
+            JsonObjectBuilder linksBuilder = Json.createObjectBuilder()
+                    .add("Add new patient", Json.createObjectBuilder()
+                            .add("href", "/MyProject/api/records/add-form-patient")
+                            .add("method", "GET"))
+                    .add("View Users", Json.createObjectBuilder()
+                            .add("href", "/MyProject/api/records/users")
+                            .add("method", "GET"));
+
+            linkBuilder.add("_links", linksBuilder);
+
+            JsonObjectBuilder headerBuilder = Json.createObjectBuilder();
+
+            headerBuilder.add("header patientId", "Patient Id");
+            headerBuilder.add("header name", "Name");
+            headerBuilder.add("header surname", "Surname");
+
+            patientArrayBuilder.add(linkBuilder);
+            patientArrayBuilder.add(headerBuilder);
+            patients.forEach(patient -> {
+                JsonObjectBuilder patientJson = Json.createObjectBuilder()
+                        .add("patientId", patient.getPatientId())
+                        .add("name", patient.getName())
+                        .add("surname", patient.getSurname())
+                        .add("_links", Json.createObjectBuilder()
+                                .add("View records", Json.createObjectBuilder()
+                                        .add("href", "/MyProject/api/records/date-form/" + patient.getPatientId())
+                                        .add("method", "GET"))
+                                .add("Edit Patient", Json.createObjectBuilder()
+                                        .add("href",
+                                                "/MyProject/api/records/update-form-patient/" + patient.getPatientId())
+                                        .add("method", "GET")));
+
+                patientArrayBuilder.add(patientJson);
+            });
+
+            // Build the JSON object with hypermedia links
+            JsonObjectBuilder responseBuilder = Json.createObjectBuilder()
+                    .add("status", "success")
+                    .add("data", patientArrayBuilder);
+
+            return responseBuilder.build();
+        }
+        // Catch the exception thrown by addUser method
+        return (JsonObject) Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                .entity("An unexpected error occurred").build();
+    }
+
     @GET
     @RolesAllowed("ADMIN")
     @Path("/users")
@@ -185,11 +174,10 @@ return (JsonObject) Response.status(Response.Status.INTERNAL_SERVER_ERROR).entit
                         .add("role", user.getRole())
                         .add("_links", Json.createObjectBuilder()
                                 .add("Delete", Json.createObjectBuilder()
-                                        .add("href", "/MyProject/api/records/user-delete/"+user.getId())
+                                        .add("href", "/MyProject/api/records/user-delete/" + user.getId())
                                         .add("method", "DELETE"))
-                                
-                                		);
-                                
+
+                        );
 
                 userArrayBuilder.add(userJson);
             });
@@ -208,7 +196,6 @@ return (JsonObject) Response.status(Response.Status.INTERNAL_SERVER_ERROR).entit
                 .build();
     }
 
-    
     @GET
     @RolesAllowed("ADMIN")
     @Path("/add-form-user")
@@ -216,7 +203,8 @@ return (JsonObject) Response.status(Response.Status.INTERNAL_SERVER_ERROR).entit
     public Response getAddUserForm() {
         // Provide HTML form for creating a user
         String formHtml = String.format(
-        		"<form id='userForm' action='api/records/add-user' method='POST' data-method='POST' onsubmit='submitForm()'>" +
+                "<form id='userForm' action='api/records/add-user' method='POST' data-method='POST' onsubmit='submitForm()'>"
+                        +
                         "<label for='name'>Name:</label>" +
                         "<input type='text' id='name' name='name' required><br>" +
                         "<label for='surname'>Surname:</label>" +
@@ -231,8 +219,7 @@ return (JsonObject) Response.status(Response.Status.INTERNAL_SERVER_ERROR).entit
                         "<option value='PHYSICIANS'>PHYSICIANS</option>" +
                         "</select><br>" +
                         "<input type='submit' value='Create User'>" +
-                        "</form>"
-        );
+                        "</form>");
 
         JsonObject jsonObject = Json.createObjectBuilder()
                 .add("formHtml", formHtml)
@@ -240,7 +227,7 @@ return (JsonObject) Response.status(Response.Status.INTERNAL_SERVER_ERROR).entit
 
         return Response.ok(jsonObject.toString()).build();
     }
-    
+
     @GET
     @Path("/date-form/{id}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -253,8 +240,8 @@ return (JsonObject) Response.status(Response.Status.INTERNAL_SERVER_ERROR).entit
                         "<label for='endDate'>End Date:</label>" +
                         "<input type='date' id='endDate' name='endDate'><br>" +
                         "<input type='submit' value='get patient records'>" +
-                        "</form>", patientId
-        );
+                        "</form>",
+                patientId);
 
         JsonObject jsonObject = Json.createObjectBuilder()
                 .add("formHtml", formHtml)
@@ -262,24 +249,23 @@ return (JsonObject) Response.status(Response.Status.INTERNAL_SERVER_ERROR).entit
 
         return Response.ok(jsonObject.toString()).build();
     }
-    
 
     @GET
-    @RolesAllowed({"ADMIN", "PHYSICIAN"})
+    @RolesAllowed({ "ADMIN", "PHYSICIAN" })
     @Path("/patient-records/{id}")
     public Response getAllRecordsNoFilter(@PathParam("id") int patientId, @QueryParam("startDate") String startDate,
             @QueryParam("endDate") String endDate) {
-    	
-    	List<Record> records = dao.getAllRecordsWithinTheSpecifiedPeriod(patientId, startDate,endDate);
-    	if(records != null) {
-        Response response = buildResponse(records, patientId, startDate,endDate);
-        return response;
-    	}
-    	return Response.status(Response.Status.NOT_FOUND).entity("An unexpected error occurred").build();
+
+        List<Record> records = dao.getAllRecordsWithinTheSpecifiedPeriod(patientId, startDate, endDate);
+        if (records != null) {
+            Response response = buildResponse(records, patientId, startDate, endDate);
+            return response;
+        }
+        return Response.status(Response.Status.NOT_FOUND).entity("An unexpected error occurred").build();
     }
 
     private Response buildResponse(List<Record> records, int patientId, String startDate, String endDate) {
-        
+
         List<Record> chart = dao.getRecordsWithinPeriod(patientId, startDate, endDate);
         Map<String, Double> averages = dao.getAverageValues(patientId, startDate, endDate);
         Double averageGlucose = averages.get("averageGlucose");
@@ -315,28 +301,18 @@ return (JsonObject) Response.status(Response.Status.INTERNAL_SERVER_ERROR).entit
                 .add("chartData", chartArrayBuilder);
 
         recordsArrayBuilder.add(chartDataBuilder);
-        
+
         JsonObjectBuilder headerBuilder = Json.createObjectBuilder();
 
-        headerBuilder.add("header ID","ID" );
-        headerBuilder.add("header Glucose level","Glucose level" );
-        headerBuilder.add("header Carb intake","Carb intake" );
-        headerBuilder.add("header medication dose","medication dose" );
-        headerBuilder.add("header entry date","entry date" );
-        headerBuilder.add("header Patient id","Patient id" );
-        
+        headerBuilder.add("header ID", "ID");
+        headerBuilder.add("header Glucose level", "Glucose level");
+        headerBuilder.add("header Carb intake", "Carb intake");
+        headerBuilder.add("header medication dose", "medication dose");
+        headerBuilder.add("header entry date", "entry date");
+        headerBuilder.add("header Patient id", "Patient id");
 
-        
-
-       
         recordsArrayBuilder.add(headerBuilder);
-        
-        
-        // Use the same list of records for both records and chart data
-       
 
-        
-        
         // Add records data to the response
         records.forEach(record -> {
             JsonObjectBuilder recordBuilder = Json.createObjectBuilder()
@@ -371,28 +347,29 @@ return (JsonObject) Response.status(Response.Status.INTERNAL_SERVER_ERROR).entit
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAddRecordForm(@PathParam("id") int patientId) {
         // Provide HTML form for adding a record
-    	
-    	String formHtml = String.format(
-    		    "<form id='addForm' action='/MyProject/api/records/add' method='POST' data-method='POST'>" +
-    		    "<label for='glucoseLevel'>Glucose Level:</label>" +
-    		    "<input type='text' name='glucoseLevel'><br>" +
-    		    "<label for='carbIntake'>Carb Intake:</label>" +
-    		    "<input type='text' name='carbIntake'><br>" +
-    		    "<label for='medicationDose'>Medication Dose:</label>" +
-    		    "<input type='text' name=medicationDose><br>" +
-    		    "<label for='entryDate'>Entry Date:</label>" +
-    		    "<input type='text' name='entryDate' id='entryDate' disabled><br>" +
-    		    "<input type='text' name='patientId' value='%d' hidden >" +
-    		    "<input type='submit' value='Add Record'>" +
-    		    "</form>" +
-    		    "<script>" +
-    		    "var today = new Date();" +
-    		    "var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();" +
-    		    "document.getElementById('entryDate').value = date;" +
-    		    "</script>", patientId, patientId
-    	
+
+        String formHtml = String.format(
+                "<form id='addForm' action='/MyProject/api/records/add' method='POST' data-method='POST'>" +
+                        "<label for='glucoseLevel'>Glucose Level:</label>" +
+                        "<input type='text' name='glucoseLevel'><br>" +
+                        "<label for='carbIntake'>Carb Intake:</label>" +
+                        "<input type='text' name='carbIntake'><br>" +
+                        "<label for='medicationDose'>Medication Dose:</label>" +
+                        "<input type='text' name=medicationDose><br>" +
+                        "<label for='entryDate'>Entry Date:</label>" +
+                        "<input type='text' name='entryDate' id='entryDate' disabled><br>" +
+                        "<input type='text' name='patientId' value='%d' hidden >" +
+                        "<input type='submit' value='Add Record'>" +
+                        "</form>" +
+                        "<script>" +
+                        "var today = new Date();" +
+                        "var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();" +
+                        "document.getElementById('entryDate').value = date;" +
+                        "</script>",
+                patientId, patientId
+
         );
-    	
+
         JsonObject jsonObject = Json.createObjectBuilder()
                 .add("formHtml", formHtml)
                 .build();
@@ -406,13 +383,15 @@ return (JsonObject) Response.status(Response.Status.INTERNAL_SERVER_ERROR).entit
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAddPatientForm() {
         // Provide HTML form for adding a patient
-        String formHtml = String.format("<form id='addPatientForm' action='/MyProject/api/records/add-patient' method='POST' data-method='POST'>" +
-                "<label for='name'>Name:</label>" +
-                "<input type='text' name='name'><br>" +
-                "<label for='surname'>Surname:</label>" +
-                "<input type='text' name='surname'><br>" +
-                "<input type='submit' value='Add Patient'>" +
-                "</form>");
+        String formHtml = String.format(
+                "<form id='addPatientForm' action='/MyProject/api/records/add-patient' method='POST' data-method='POST'>"
+                        +
+                        "<label for='name'>Name:</label>" +
+                        "<input type='text' name='name'><br>" +
+                        "<label for='surname'>Surname:</label>" +
+                        "<input type='text' name='surname'><br>" +
+                        "<input type='submit' value='Add Patient'>" +
+                        "</form>");
 
         JsonObject jsonObject = Json.createObjectBuilder()
                 .add("formHtml", formHtml)
@@ -421,8 +400,6 @@ return (JsonObject) Response.status(Response.Status.INTERNAL_SERVER_ERROR).entit
         return Response.ok(jsonObject.toString()).build();
     }
 
-    
-    
     @GET
     @RolesAllowed("ADMIN")
     @Path("/update-form/{id}")
@@ -433,36 +410,34 @@ return (JsonObject) Response.status(Response.Status.INTERNAL_SERVER_ERROR).entit
 
         if (record != null) {
             // Provide JSON response for updating a record with pre-filled data
-        	String formHtml = String.format(
-        			
-        	        "<form id='updateForm' action='/MyProject/api/records/update/%d' method='PUT' data-method='PUT'>" +
-        	        "<label for='id'>ID:</label>" +
-        	        "<input type='text' name='id' value='%d' disabled><br>" +
-        	        "<label for='glucoseLevel'>Glucose Level:</label>" +
-        	        "<input type='text' name='glucoseLevel' value='%s'><br>" +
-        	        "<label for='carbIntake'>Carb Intake:</label>" +
-        	        "<input type='text' name='carbIntake' value='%s'><br>" +
-        	        "<label for='medicationDose'>Medication Dose:</label>" +
-        	        "<input type='text' name='medicationDose' value='%s'><br>" +
-        	        "<label for='entryDate'>Entry Date:</label>" +
-        	        "<input type='text' name='entryDate' id='entryDate' disabled><br>" +  
-        	        "<input type='submit' value='Update Record'>" +
-        	        "</form>" +
-        	        "<form id='deleteForm' action='/MyProject/api/records/delete/%d' method='DELETE' data-method='DELETE'>" +
-        	        
-        	        "<input type='hidden' name='deleteId' value='%d'>" +  // Use a hidden field for delete ID
-        	        "<input type='submit' value='Delete Record'>" +
-        	        "</form>" +
-        	        "<script>" +
-        	        "var today = new Date();" +
-        	        "var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();" +
-        	        "document.getElementById('entryDate').value = date;" +
-        	        "</script>",
-        	        id, id, record.getGlucoseLevel(), record.getCarbIntake(), record.getMedicationDose(),
-        	        id, id);
+            String formHtml = String.format(
 
+                    "<form id='updateForm' action='/MyProject/api/records/update/%d' method='PUT' data-method='PUT'>" +
+                            "<label for='id'>ID:</label>" +
+                            "<input type='text' name='id' value='%d' disabled><br>" +
+                            "<label for='glucoseLevel'>Glucose Level:</label>" +
+                            "<input type='text' name='glucoseLevel' value='%s'><br>" +
+                            "<label for='carbIntake'>Carb Intake:</label>" +
+                            "<input type='text' name='carbIntake' value='%s'><br>" +
+                            "<label for='medicationDose'>Medication Dose:</label>" +
+                            "<input type='text' name='medicationDose' value='%s'><br>" +
+                            "<label for='entryDate'>Entry Date:</label>" +
+                            "<input type='text' name='entryDate' id='entryDate' disabled><br>" +
+                            "<input type='submit' value='Update Record'>" +
+                            "</form>" +
+                            "<form id='deleteForm' action='/MyProject/api/records/delete/%d' method='DELETE' data-method='DELETE'>"
+                            +
 
-
+                            "<input type='hidden' name='deleteId' value='%d'>" + // Use a hidden field for delete ID
+                            "<input type='submit' value='Delete Record'>" +
+                            "</form>" +
+                            "<script>" +
+                            "var today = new Date();" +
+                            "var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();" +
+                            "document.getElementById('entryDate').value = date;" +
+                            "</script>",
+                    id, id, record.getGlucoseLevel(), record.getCarbIntake(), record.getMedicationDose(),
+                    id, id);
 
             JsonObject jsonObject = Json.createObjectBuilder()
                     .add("formHtml", formHtml)
@@ -471,7 +446,8 @@ return (JsonObject) Response.status(Response.Status.INTERNAL_SERVER_ERROR).entit
             return Response.ok(jsonObject.toString()).build();
         } else {
             // Handle the case where the record with the given ID is not found
-        	return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("An unexpected error occurred").build();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("An unexpected error occurred")
+                    .build();
         }
     }
 
@@ -485,27 +461,26 @@ return (JsonObject) Response.status(Response.Status.INTERNAL_SERVER_ERROR).entit
 
         if (patient != null) {
             // Provide JSON response for updating a record with pre-filled data
-        	String formHtml = String.format(
-        	        "<form id='updateForm' action='/MyProject/api/records/update-patient/%d' method='PUT' data-method='PUT'>" +
-        	        "<label for='id'>ID:</label>" +
-        	        "<input type='text' name='id' value='%d' disabled><br>" +
-        	        "<label for='name'>Name:</label>" +
-        	        "<input type='text' name='name' value='%s'><br>" +
-        	        "<label for='surname'>Surname:</label>" +
-        	        "<input type='text' name='surname' value='%s'><br>" + 
-        	        "<input type='submit' value='Update Record'>" +
-        	        "</form>" +
-        	        "<form id='deleteForm' action='/MyProject/api/records/delete-patient/%d' method='DELETE' data-method='DELETE'>" +
-        	        
-        	        "<input type='hidden' name='deleteId' value='%d'>" +  // Use a hidden field for delete ID
-        	        "<input type='submit' value='Delete Record'>" +
-        	        "</form>",
-  
-        	        id, id, patient.getName(), patient.getSurname(),
-        	        id, id);
+            String formHtml = String.format(
+                    "<form id='updateForm' action='/MyProject/api/records/update-patient/%d' method='PUT' data-method='PUT'>"
+                            +
+                            "<label for='id'>ID:</label>" +
+                            "<input type='text' name='id' value='%d' disabled><br>" +
+                            "<label for='name'>Name:</label>" +
+                            "<input type='text' name='name' value='%s'><br>" +
+                            "<label for='surname'>Surname:</label>" +
+                            "<input type='text' name='surname' value='%s'><br>" +
+                            "<input type='submit' value='Update Record'>" +
+                            "</form>" +
+                            "<form id='deleteForm' action='/MyProject/api/records/delete-patient/%d' method='DELETE' data-method='DELETE'>"
+                            +
 
+                            "<input type='hidden' name='deleteId' value='%d'>" + // Use a hidden field for delete ID
+                            "<input type='submit' value='Delete Record'>" +
+                            "</form>",
 
-
+                    id, id, patient.getName(), patient.getSurname(),
+                    id, id);
 
             JsonObject jsonObject = Json.createObjectBuilder()
                     .add("formHtml", formHtml)
@@ -514,24 +489,25 @@ return (JsonObject) Response.status(Response.Status.INTERNAL_SERVER_ERROR).entit
             return Response.ok(jsonObject.toString()).build();
         } else {
             // Handle the case where the record with the given ID is not found
-        	return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("An unexpected error occurred").build();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("An unexpected error occurred")
+                    .build();
         }
     }
 
     @DELETE
     @RolesAllowed("ADMIN")
     @Path("/user-delete/{id}")
-   public Response deleteUser(@PathParam("id") int id) {
-       if(dao.deleteUserById(id)) {
-    	   
-           	return Response.ok("User was deleted succesfuly").build();
-           } 
-           	return Response.status(Response.Status.NOT_FOUND).build();
-       
+    public Response deleteUser(@PathParam("id") int id) {
+        if (dao.deleteUserById(id)) {
+
+            return Response.ok("User was deleted succesfuly").build();
+        }
+        return Response.status(Response.Status.NOT_FOUND).build();
+
     }
 
     @GET
-    @RolesAllowed({"ADMIN", "PHYSICIAN"})
+    @RolesAllowed({ "ADMIN", "PHYSICIAN" })
     @Path("user/{id}")
     public Response getUserById(@PathParam("id") int userId) {
         User user = dao.getUserById(userId);
@@ -559,9 +535,9 @@ return (JsonObject) Response.status(Response.Status.INTERNAL_SERVER_ERROR).entit
             return Response.status(Response.Status.NOT_FOUND).entity("User not found").build();
         }
     }
-    
+
     @GET
-    @RolesAllowed({"ADMIN", "PHYSICIAN"})
+    @RolesAllowed({ "ADMIN", "PHYSICIAN" })
     @Path("/{id}")
     public Response getRecordById(@PathParam("id") long id) {
         Record record = dao.getRecordById(id);
@@ -570,11 +546,11 @@ return (JsonObject) Response.status(Response.Status.INTERNAL_SERVER_ERROR).entit
             // Manually construct the JSON object with a predefined order
 
             JsonObjectBuilder recordBuilder = Json.createObjectBuilder()
-           .add("header ID","ID" )
-        	.add("header Glucose level","Glucose level" )
-        	.add("header Carb intake","Carb intake" )
-        	.add("header medication dose","medication dose" )
-        	.add("header entry date","entry date" )
+                    .add("header ID", "ID")
+                    .add("header Glucose level", "Glucose level")
+                    .add("header Carb intake", "Carb intake")
+                    .add("header medication dose", "medication dose")
+                    .add("header entry date", "entry date")
                     .add("id", record.getId())
                     .add("glucoseLevel", record.getGlucoseLevel())
                     .add("carbIntake", record.getCarbIntake())
@@ -582,9 +558,8 @@ return (JsonObject) Response.status(Response.Status.INTERNAL_SERVER_ERROR).entit
                     .add("entryDate", record.getEntryDate())
                     .add("_links", Json.createObjectBuilder()
                             .add("edit", Json.createObjectBuilder()
-                            		.add("href", "/MyProject/api/records/update-form/" + record.getId())
-                                    .add("method", "GET"))
-                    );
+                                    .add("href", "/MyProject/api/records/update-form/" + record.getId())
+                                    .add("method", "GET")));
 
             // Build the JSON object
             JsonObject jsonResponse = recordBuilder.build();
@@ -596,7 +571,6 @@ return (JsonObject) Response.status(Response.Status.INTERNAL_SERVER_ERROR).entit
         }
     }
 
-  
     @PUT
     @RolesAllowed("ADMIN")
     @Path("/update/{id}")
@@ -604,15 +578,13 @@ return (JsonObject) Response.status(Response.Status.INTERNAL_SERVER_ERROR).entit
     public Response updateRecord(@PathParam("id") Long id, Record updatedRecord) {
         boolean updateSuccess = dao.updateRecord(id, updatedRecord);
 
-        
         if (updateSuccess) {
-        	return Response.ok("Record was update succesfuly").build();
-        } 
-        	return Response.status(Response.Status.NOT_FOUND).build();
-       
-        
+            return Response.ok("Record was update succesfuly").build();
+        }
+        return Response.status(Response.Status.NOT_FOUND).build();
+
     }
-    
+
     @PUT
     @RolesAllowed("ADMIN")
     @Path("/update-patient/{id}")
@@ -621,57 +593,55 @@ return (JsonObject) Response.status(Response.Status.INTERNAL_SERVER_ERROR).entit
         boolean updateSuccess = dao.updatePatient(id, updatedPatient);
 
         if (updateSuccess) {
-        	return Response.ok("Patient was update succesfuly").build();
-        } 
-        	return Response.status(Response.Status.NOT_FOUND).build();
+            return Response.ok("Patient was update succesfuly").build();
+        }
+        return Response.status(Response.Status.NOT_FOUND).build();
     }
-    
-    
+
     @DELETE
     @RolesAllowed("ADMIN")
     @Path("/delete/{id}")
-   public Response deleteRecord(@PathParam("id") Long id) {
-       if(dao.deleteRecord(id)) {
-    	   
-           	return Response.ok("Record was deleted succesfuly").build();
-           } 
-           	return Response.status(Response.Status.NOT_FOUND).build();
-       
+    public Response deleteRecord(@PathParam("id") Long id) {
+        if (dao.deleteRecord(id)) {
+
+            return Response.ok("Record was deleted succesfuly").build();
+        }
+        return Response.status(Response.Status.NOT_FOUND).build();
+
     }
-    
+
     @DELETE
     @RolesAllowed("ADMIN")
     @Path("/delete-patient/{id}")
-   public Response deletePatient(@PathParam("id") int id) {
-       if(dao.deletePatient(id)) {
+    public Response deletePatient(@PathParam("id") int id) {
+        if (dao.deletePatient(id)) {
 
-       return Response.ok("Record was deleted succesfuly").build();
-    } 
-    	return Response.status(Response.Status.NOT_FOUND).build();
+            return Response.ok("Record was deleted succesfuly").build();
+        }
+        return Response.status(Response.Status.NOT_FOUND).build();
     }
-@POST
-@RolesAllowed("ADMIN")
-@Path("/add-patient")
-public Response addPatient(Patient patient) {
-	if(dao.addPatient(patient)) {
-		return Response.ok("Patient was added succesfuly").build();
-	}
-	return Response.status(Response.Status.NOT_FOUND).build();
-   
-}
 
+    @POST
+    @RolesAllowed("ADMIN")
+    @Path("/add-patient")
+    public Response addPatient(Patient patient) {
+        if (dao.addPatient(patient)) {
+            return Response.ok("Patient was added succesfuly").build();
+        }
+        return Response.status(Response.Status.NOT_FOUND).build();
+
+    }
 
     @POST
     @RolesAllowed("ADMIN")
     @Path("/add")
     public Response addRecord(Record record) {
-    	
-        if(dao.addDailyRecord(record)){
-        	return Response.ok("Record was added succesfuly").build();
+
+        if (dao.addDailyRecord(record)) {
+            return Response.ok("Record was added succesfuly").build();
         }
         return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
-        
+
     }
-    
 
 }
