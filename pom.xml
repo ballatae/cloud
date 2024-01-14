@@ -30,7 +30,12 @@
     <artifactId>java-jwt</artifactId>
     <version>4.4.0</version>
 </dependency>
-
+<dependency>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+            <version>6.0.0</version>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>org.glassfish.jersey.inject</groupId>
             <artifactId>jersey-hk2</artifactId>
@@ -44,6 +49,11 @@
         <artifactId>mysql-connector-java</artifactId>
         <version>8.0.23</version> <!-- Use the latest version -->
     </dependency>
+    <dependency>
+    	<groupId>at.favre.lib</groupId>
+    	<artifactId>bcrypt</artifactId>
+    	<version>0.10.2</version>
+	</dependency>
     </dependencies>
     <properties>
         <jersey.version>3.1.0-M3</jersey.version>
