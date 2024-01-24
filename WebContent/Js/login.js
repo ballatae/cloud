@@ -1,6 +1,6 @@
 // API Configuration
 var apiConfig = {
-  baseUrl: "http://localhost:8082/MyProject/api",
+  baseUrl: "/api",
   recordsEndpoint: "/records",
   logIn: "/login",
 };
