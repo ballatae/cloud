@@ -93,10 +93,10 @@ public class RecordResource {
             JsonObjectBuilder linkBuilder = Json.createObjectBuilder();
             JsonObjectBuilder linksBuilder = Json.createObjectBuilder()
                     .add("Add new patient", Json.createObjectBuilder()
-                            .add("href", "/MyProject/api/records/add-form-patient")
+                            .add("href", "/api/records/add-form-patient")
                             .add("method", "GET"))
                     .add("View Users", Json.createObjectBuilder()
-                            .add("href", "/MyProject/api/records/users")
+                            .add("href", "/api/records/users")
                             .add("method", "GET"));
 
             linkBuilder.add("_links", linksBuilder);
@@ -116,11 +116,11 @@ public class RecordResource {
                         .add("surname", patient.getSurname())
                         .add("_links", Json.createObjectBuilder()
                                 .add("View records", Json.createObjectBuilder()
-                                        .add("href", "/MyProject/api/records/date-form/" + patient.getPatientId())
+                                        .add("href", "/api/records/date-form/" + patient.getPatientId())
                                         .add("method", "GET"))
                                 .add("Edit Patient", Json.createObjectBuilder()
                                         .add("href",
-                                                "/MyProject/api/records/update-form-patient/" + patient.getPatientId())
+                                                "/api/records/update-form-patient/" + patient.getPatientId())
                                         .add("method", "GET")));
 
                 patientArrayBuilder.add(patientJson);
@@ -150,7 +150,7 @@ public class RecordResource {
             JsonObjectBuilder linkBuilder = Json.createObjectBuilder();
             JsonObjectBuilder linksBuilder = Json.createObjectBuilder()
                     .add("Add new user", Json.createObjectBuilder()
-                            .add("href", "/MyProject/api/records/add-form-user")
+                            .add("href", "/api/records/add-form-user")
                             .add("method", "GET"));
 
             linkBuilder.add("_links", linksBuilder);
@@ -174,7 +174,7 @@ public class RecordResource {
                         .add("role", user.getRole())
                         .add("_links", Json.createObjectBuilder()
                                 .add("Delete", Json.createObjectBuilder()
-                                        .add("href", "/MyProject/api/records/user-delete/" + user.getId())
+                                        .add("href", "/api/records/user-delete/" + user.getId())
                                         .add("method", "DELETE"))
 
                         );
@@ -280,7 +280,7 @@ public class RecordResource {
 
         JsonObjectBuilder linksBuilder = Json.createObjectBuilder()
                 .add("Add new record", Json.createObjectBuilder()
-                        .add("href", "/MyProject/api/records/add-form-record/" + patientId)
+                        .add("href", "/api/records/add-form-record/" + patientId)
                         .add("method", "GET"));
 
         linkBuilder.add("_links", linksBuilder);
@@ -324,7 +324,7 @@ public class RecordResource {
                     .add("Patient id", record.getPatientId())
                     .add("_links", Json.createObjectBuilder()
                             .add("View", Json.createObjectBuilder()
-                                    .add("href", "/MyProject/api/records/" + record.getId())
+                                    .add("href", "/api/records/" + record.getId())
                                     .add("method", "GET")));
 
             recordsArrayBuilder.add(recordBuilder);
@@ -349,7 +349,7 @@ public class RecordResource {
         // Provide HTML form for adding a record
 
         String formHtml = String.format(
-                "<form id='addForm' action='/MyProject/api/records/add' method='POST' data-method='POST'>" +
+                "<form id='addForm' action='api/records/add' method='POST' data-method='POST'>" +
                         "<label for='glucoseLevel'>Glucose Level:</label>" +
                         "<input type='text' name='glucoseLevel'><br>" +
                         "<label for='carbIntake'>Carb Intake:</label>" +
@@ -384,7 +384,7 @@ public class RecordResource {
     public Response getAddPatientForm() {
         // Provide HTML form for adding a patient
         String formHtml = String.format(
-                "<form id='addPatientForm' action='/MyProject/api/records/add-patient' method='POST' data-method='POST'>"
+                "<form id='addPatientForm' action='/api/records/add-patient' method='POST' data-method='POST'>"
                         +
                         "<label for='name'>Name:</label>" +
                         "<input type='text' name='name'><br>" +
@@ -412,7 +412,7 @@ public class RecordResource {
             // Provide JSON response for updating a record with pre-filled data
             String formHtml = String.format(
 
-                    "<form id='updateForm' action='/MyProject/api/records/update/%d' method='PUT' data-method='PUT'>" +
+                    "<form id='updateForm' action='/api/records/update/%d' method='PUT' data-method='PUT'>" +
                             "<label for='id'>ID:</label>" +
                             "<input type='text' name='id' value='%d' disabled><br>" +
                             "<label for='glucoseLevel'>Glucose Level:</label>" +
@@ -425,7 +425,7 @@ public class RecordResource {
                             "<input type='text' name='entryDate' id='entryDate' disabled><br>" +
                             "<input type='submit' value='Update Record'>" +
                             "</form>" +
-                            "<form id='deleteForm' action='/MyProject/api/records/delete/%d' method='DELETE' data-method='DELETE'>"
+                            "<form id='deleteForm' action='/api/records/delete/%d' method='DELETE' data-method='DELETE'>"
                             +
 
                             "<input type='hidden' name='deleteId' value='%d'>" + // Use a hidden field for delete ID
@@ -462,7 +462,7 @@ public class RecordResource {
         if (patient != null) {
             // Provide JSON response for updating a record with pre-filled data
             String formHtml = String.format(
-                    "<form id='updateForm' action='/MyProject/api/records/update-patient/%d' method='PUT' data-method='PUT'>"
+                    "<form id='updateForm' action='/api/records/update-patient/%d' method='PUT' data-method='PUT'>"
                             +
                             "<label for='id'>ID:</label>" +
                             "<input type='text' name='id' value='%d' disabled><br>" +
@@ -472,7 +472,7 @@ public class RecordResource {
                             "<input type='text' name='surname' value='%s'><br>" +
                             "<input type='submit' value='Update Record'>" +
                             "</form>" +
-                            "<form id='deleteForm' action='/MyProject/api/records/delete-patient/%d' method='DELETE' data-method='DELETE'>"
+                            "<form id='deleteForm' action='/api/records/delete-patient/%d' method='DELETE' data-method='DELETE'>"
                             +
 
                             "<input type='hidden' name='deleteId' value='%d'>" + // Use a hidden field for delete ID
@@ -558,7 +558,7 @@ public class RecordResource {
                     .add("entryDate", record.getEntryDate())
                     .add("_links", Json.createObjectBuilder()
                             .add("edit", Json.createObjectBuilder()
-                                    .add("href", "/MyProject/api/records/update-form/" + record.getId())
+                                    .add("href", "/api/records/update-form/" + record.getId())
                                     .add("method", "GET")));
 
             // Build the JSON object
