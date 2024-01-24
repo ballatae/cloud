@@ -23,9 +23,9 @@ import at.favre.lib.crypto.bcrypt.BCrypt;
 public class RecordDAO {
 
     private static RecordDAO instance;
-    private static final String URL = "jdbc:mysql://localhost:3306/diabetes";
-    private static final String USER = "root";
-    private static final String PASSWORD = "mysql";
+    private static final String URL = "jdbc:mysql://oliadkuxrl9xdugh.chr7pe7iynqr.eu-west-1.rds.amazonaws.com";
+    private static final String USER = "zl1dq9e5pcssqh8l";
+    private static final String PASSWORD = "eops3198x9nvlkfz";
     private Connection connection; // Declare a Connection instance
 
     // JDBC SQL statements for CRUD operations
